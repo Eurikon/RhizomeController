@@ -49,6 +49,11 @@ for (const choice of interfaceChoices) {
 }
 selectInterface('panel');
 
+const contactStatus = document.querySelector('.contact-status');
+if (contactStatus && new URLSearchParams(location.search).get('contact') === 'sent') {
+  contactStatus.hidden = false;
+}
+
 const links = [...document.querySelectorAll('.navigation a[href^="#"]')];
 const sections = links.map(link => ({link, section: document.getElementById(link.hash.slice(1))}))
   .filter(entry => entry.section)
@@ -149,7 +154,11 @@ if (sections.length) {
     const observer = new ResizeObserver(updateOffset);
     observer.observe(sidebar);
     observer.observe(toolbar);
-    for (const entry of sections) observer.observe(entry.anchor);
+    for (const entry of sections) {
+      observer.observe(entry.anchor);
+      // Comments can expand after navigating to the section below them.
+      observer.observe(entry.section);
+    }
     if (shot) observer.observe(shot);
   }
   updateOffset();

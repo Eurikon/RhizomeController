@@ -151,7 +151,19 @@ details > div p + p, .development-details > div p + p { margin-top: 12px; }
 .inside-photo figcaption { padding: 16px 18px; }
 .inside-photo h3 { font-size: 14px; }
 .inside-photo p { margin-top: 6px; color: #8c9aa7; font-size: 11px; }
-.discuss-section { border-top: 1px solid var(--line); }
+.discuss-section, .contact-section { border-top: 1px solid var(--line); }
+.contact-form { max-width: 740px; padding: 26px; border: 1px solid #01aef036; border-radius: 7px; background: linear-gradient(135deg, #01aef007, #1a1e2280); }
+.contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.contact-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-size: 12px; }
+.contact-field small { color: var(--muted); font-size: 11px; }
+.contact-field input, .contact-field textarea { width: 100%; min-width: 0; border: 1px solid #3b4651; border-radius: 4px; padding: 11px 12px; background: var(--background); color: var(--text); font: 13px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.contact-field textarea { resize: vertical; min-height: 160px; }
+.contact-field input:focus-visible, .contact-field textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.contact-trap { display: none; }
+.contact-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+.contact-footer p { color: var(--muted); font-size: 11px; }
+.contact-footer a { color: var(--blue-soft); text-decoration: underline; text-underline-offset: 3px; }
+.contact-status { margin-top: 18px; color: var(--blue-soft); font-size: 13px; }
 .discuss-section .section-heading { align-items: center; margin-bottom: 22px; }
 .discussion-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .discussion-actions .button { padding: 9px 12px; font-size: 10px; gap: 12px; }
@@ -316,6 +328,9 @@ body.image-open { overflow: hidden; }
   .status-grid { grid-template-columns: 1fr; gap: 16px; }
   .inside-grid { grid-template-columns: 1fr; }
   .discuss-section .discussion-actions { margin-top: 22px; }
+  .contact-form { padding: 22px 18px; }
+  .contact-fields { grid-template-columns: 1fr; gap: 0; }
+  .contact-field input, .contact-field textarea { font-size: 16px; }
   .discussion-panel { padding: 22px 18px; }
   .discussion-panel { grid-template-columns: 1fr; gap: 26px; }
   .discussion-view { border-left: 0; border-top: 1px solid var(--line); padding: 25px 0 0; }

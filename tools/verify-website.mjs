@@ -6,13 +6,15 @@ import path from 'node:path';
 
 const args = process.argv.slice(2);
 const discussionsOnly = args.includes('--discussions-only');
+const contactOnly = args.includes('--contact-only');
 const anchorsOnly = args.includes('--anchors-only');
 const projectEntryOnly = args.includes('--project-entry-only');
 const address = args.find(argument => !argument.startsWith('--'));
 assert(address, 'Pass the running website URL');
-assert(args.every(argument => argument === address || argument === '--anchors-only' || argument === '--project-entry-only' || argument === '--discussions-only'), 'Unknown verification option');
+assert(args.every(argument => argument === address || argument === '--anchors-only' || argument === '--project-entry-only' || argument === '--discussions-only' || argument === '--contact-only'), 'Unknown verification option');
 const base = address.endsWith('/') ? address : address + '/';
 const onProject = new URL(base).pathname.includes('/projects/zynthian-edition/');
+assert(!contactOnly || !onProject, 'Pass the main website URL for contact checks');
 const checkpoint = onProject ? 'status' : 'projects';
 const feedURL = 'https://raw.githubusercontent.com/Eurikon/RhizomeController/main/feed/discussions.json';
 const shots = process.env.RHIZOME_WEBSITE_SHOTS;
@@ -173,7 +175,7 @@ try {
     console.log('PASS: desktop/mobile project thumbnail opens Overview 15 px below the header');
   } else {
   const sectionIds = await evaluate(`[...document.querySelectorAll('.navigation a[href^="#"]')].map(link=>link.hash.slice(1))`);
-  assert.deepEqual(sectionIds, onProject ? ['overview','story','interface','status','inside'] : ['overview','story','projects','discuss']);
+  assert.deepEqual(sectionIds, onProject ? ['overview','story','interface','status','inside'] : ['overview','story','projects','discuss','contact']);
   if (!onProject) {
     assert.equal(await evaluate("document.querySelector('#discuss-title').textContent"), 'Rhizome Discussion Board');
     assert.equal(await evaluate("document.querySelector('.brand strong').textContent"), 'RHIZOME');
@@ -181,7 +183,7 @@ try {
     assert.equal(await evaluate("document.querySelector('meta[property=\"og:site_name\"]').content"), 'Rhizome Controller');
     assert.equal(await evaluate("document.querySelectorAll('.project-card').length"), 3);
   }
-  if (!discussionsOnly) {
+  if (!discussionsOnly && !contactOnly) {
   for (const width of [1440, 390, 1024]) {
     await send('Emulation.setDeviceMetricsOverride', {width, height: 1000, deviceScaleFactor: 1, mobile: false});
     await pause(50);
@@ -324,7 +326,7 @@ try {
     }
     assert.equal(await evaluate("document.querySelectorAll('.nav-displays i').length"), 4);
     assert.equal(await evaluate("document.querySelector('.upstream-credit a').href"), 'https://zynthian.org/');
-    if (!onProject) {
+    if (!onProject && !contactOnly) {
     assert(await evaluate("!!document.querySelector('#discuss a[href=\"https://github.com/Eurikon/RhizomeController/discussions\"]')"));
     await clickMenu('discuss');
     await verifyAnchor('discuss');
@@ -536,9 +538,93 @@ try {
     handlers.delete('Fetch.requestPaused');
     console.log('PASS: synthetic five-thread ordering, full posts, inert HTML, giscus configuration and stale-message protection, preserved selection and offline refresh');
     }
+    if (!onProject && !discussionsOnly) {
+      for (const width of [1440, 390]) {
+        await send('Emulation.setDeviceMetricsOverride', {width,height:1000,deviceScaleFactor:1,mobile:false});
+        await clickMenu('contact');
+        await verifyAnchor('contact');
+        assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'), 'Contact form overflows');
+        assert(await evaluate(`(() => {
+          const fields=[...document.querySelectorAll('.contact-field input,.contact-field textarea')];
+          return fields.every(field=>field.labels.length===1&&field.clientWidth>=200)
+            &&getComputedStyle(document.querySelector('[name="_honey"]')).display==='none';
+        })()`));
+        await captureLanding('contact', width);
+      }
+      const settings = await evaluate(`(() => {
+        const form=document.querySelector('.contact-form');
+        return {action:form.action,method:form.method,captcha:form.elements._captcha.value,
+          next:form.elements._next.value,source:form.elements._url.value,
+          autoresponse:!!form.elements._autoresponse,cc:!!form.elements._cc,statusHidden:form.querySelector('[role=status]').hidden};
+      })()`);
+      assert.equal(new URL(settings.action).origin, 'https://formsubmit.co');
+      assert(new URL(settings.action).pathname.length > 1, 'Contact destination missing');
+      assert.equal(settings.method, 'post');
+      assert.equal(settings.captcha, 'true');
+      assert.equal(settings.next, 'https://eurikon.github.io/RhizomeController/?contact=sent#contact');
+      assert.equal(settings.source, 'https://eurikon.github.io/RhizomeController/#contact');
+      assert.equal(settings.autoresponse, false);
+      assert.equal(settings.cc, false);
+      assert.equal(settings.statusHidden, true);
+      let submitted;
+      const returned = new URL(base);
+      returned.searchParams.set('contact', 'sent');
+      returned.hash = 'contact';
+      handlers.set('Fetch.requestPaused', async ({requestId,request}) => {
+        submitted = request;
+        await send('Fetch.fulfillRequest', {requestId,responseCode:303,
+          responseHeaders:[{name:'Location',value:returned.href}],body:''});
+      });
+      await send('Fetch.enable', {patterns:[{urlPattern:'https://formsubmit.co/*',requestStage:'Request'}]});
+      try {
+        await evaluate(`(() => {
+          const form=document.querySelector('.contact-form');
+          form.requestSubmit();
+          return true;
+        })()`);
+        assert.equal(submitted, undefined, 'Empty form submitted');
+        assert.equal(await evaluate(`(() => {
+          const email=document.getElementById('contact-email');
+          email.value='invalid';return email.validity.typeMismatch;
+        })()`), true);
+        assert.equal(await evaluate(`(() => {
+          const form=document.querySelector('.contact-form');
+          form.elements.email.value='reader@example.com';
+          form.elements.message.value='';
+          return form.elements.message.validity.valueMissing;
+        })()`), true);
+        await evaluate(`(() => {
+          const form=document.querySelector('.contact-form');
+          form.elements.name.value='Test Reader';
+          form.elements.message.value='A synthetic contact message for verification.';
+          form.requestSubmit();return true;
+        })()`);
+        await waitFor(()=>evaluate(`location.href===${JSON.stringify(returned.href)}&&document.readyState==='complete'&&!!document.querySelector('.contact-status:not([hidden])')`), 'Contact success return did not load');
+        assert.equal(submitted?.url, settings.action);
+        assert.equal(submitted?.method, 'POST');
+        const values = new URLSearchParams(submitted.postData);
+        assert.equal(values.get('email'), 'reader@example.com');
+        assert.equal(values.get('name'), 'Test Reader');
+        assert.equal(values.get('message'), 'A synthetic contact message for verification.');
+        assert.equal(values.get('_honey'), '');
+        assert.equal(values.get('_captcha'), 'true');
+        assert.equal(values.get('_next'), settings.next);
+        await verifyAnchor('contact');
+      } finally {
+        await send('Fetch.disable');
+        handlers.delete('Fetch.requestPaused');
+      }
+      const invalidReturn = new URL(base);
+      invalidReturn.searchParams.set('contact', 'unknown');
+      invalidReturn.hash = 'contact';
+      await send('Page.navigate', {url:invalidReturn.href});
+      await waitFor(()=>evaluate(`location.href===${JSON.stringify(invalidReturn.href)}&&document.readyState==='complete'&&!!document.querySelector('.contact-form')`), 'Contact form did not reload');
+      assert(await evaluate("document.querySelector('.contact-status').hidden"), 'Invalid return flag showed success');
+      console.log('PASS: Contact below Discussion Board, desktop/mobile anchors and fields, native validation, CAPTCHA/honeypot settings, intercepted POST and success return; no live email sent');
+    }
     for (const route of ['readme.html', 'README.md']) assert.equal((await fetch(new URL(route, base))).status, 404);
     assert.deepEqual(errors, []);
-    console.log(onProject ? 'PASS: Zynthian interface controls, image viewer, credits and version panel' : 'PASS: community hardware gallery, image viewer, credits and discussion feed');
+    console.log(onProject ? 'PASS: Zynthian interface controls, image viewer, credits and version panel' : contactOnly ? 'PASS: contact form verification' : 'PASS: Rhizome Controller navigation, credits and discussion feed');
   }
   }
 } finally {
