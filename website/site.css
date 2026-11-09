@@ -152,6 +152,7 @@ details > div p + p, .development-details > div p + p { margin-top: 12px; }
 .inside-photo h3 { font-size: 14px; }
 .inside-photo p { margin-top: 6px; color: #8c9aa7; font-size: 11px; }
 .discuss-section, .contact-section { border-top: 1px solid var(--line); }
+.contact-section .eyebrow { margin: 0; }
 .contact-form { max-width: 740px; padding: 26px; border: 1px solid #01aef036; border-radius: 7px; background: linear-gradient(135deg, #01aef007, #1a1e2280); }
 .contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .contact-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-size: 12px; }
