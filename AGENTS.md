@@ -6,9 +6,9 @@ Read [STATE.md](STATE.md), then [CONTINUE-HERE.md](CONTINUE-HERE.md) and [HANDOF
 
 ## Scope and layout
 
-This repository owns the Rhizome LE/SXE community website and discussions. Zynthian Edition is the first software implementation; its application repository is separate at `../projects/zynthian-edition/` in the local workspace. Treat Bitwig and Ableton integrations as future directions. Do not claim SXE software compatibility without evidence.
+The project and website are named **Rhizome Controller**; the discussion area is **Rhizome Discussion Board**. This repository owns the website and discussions for Rhizome LE/SXE. Zynthian Edition is the first software implementation; its application repository is separate at `../projects/zynthian-edition/` in the local workspace. Treat Bitwig and Ableton integrations as future directions. Do not claim SXE software compatibility without evidence.
 
-`website/` contains the community home, nested project pages and shared public assets. `scripts/`, `feed/` and the existing discussion workflow maintain the latest-five feed. Preserve discussion IDs and user-authored posts.
+`website/` contains the Rhizome Controller homepage, nested project pages and shared public assets. `scripts/`, `feed/` and the existing discussion workflow maintain the latest-five feed. Preserve discussion IDs and user-authored posts.
 
 ## Development and verification
 
@@ -24,4 +24,4 @@ Set `core.hooksPath` to `.githooks`. Privacy hooks inspect staging and reachable
 
 ## Publication
 
-Publish only when the owner explicitly requests it. The site workflow runs manually, independently of discussion-feed updates. Publish only the allowlisted export. Use the community address exclusively; the previous project Pages site is retired and must not be recreated or redirected. Discussion embeds and theme URLs must use the community address while preserving the existing discussion repository and IDs. Keep HANDOFF.md, STATE.md and CONTINUE-HERE.md local and ignored.
+Publish only when the owner explicitly requests it. The site workflow runs manually, independently of discussion-feed updates. Publish only the allowlisted export. Use the Rhizome Controller website address exclusively; the previous project Pages site is retired and must not be recreated or redirected. Discussion embeds and theme URLs must use the Rhizome Controller website address while preserving the existing discussion repository and IDs. Keep HANDOFF.md, STATE.md and CONTINUE-HERE.md local and ignored.

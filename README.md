@@ -1,4 +1,4 @@
-# Rhizome Community
+# Rhizome Controller
 
 A community for **Rhizome LE and Rhizome SXE** owners, an independent project by Twisted Cable.
 
@@ -6,7 +6,7 @@ Feeltune abandoned the product line. This community brings together hardware kno
 
 **Zynthian Edition** is the first software project, currently in Alpha and developed against the Rhizome LE. Its application source remains in a separate repository and will be open-sourced at stable Beta. Bitwig and Ableton integrations are future directions, with no implementation available yet. SXE compatibility is not established.
 
-[Community website](https://eurikon.github.io/RhizomeController/) · [Zynthian Edition](https://eurikon.github.io/RhizomeController/projects/zynthian-edition/) · [Discussion](https://github.com/Eurikon/RhizomeController/discussions)
+[Website](https://eurikon.github.io/RhizomeController/) · [Zynthian Edition](https://eurikon.github.io/RhizomeController/projects/zynthian-edition/) · [Rhizome Discussion Board](https://github.com/Eurikon/RhizomeController/discussions)
 
 ## Repository contents
 

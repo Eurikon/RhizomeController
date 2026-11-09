@@ -175,8 +175,10 @@ try {
   const sectionIds = await evaluate(`[...document.querySelectorAll('.navigation a[href^="#"]')].map(link=>link.hash.slice(1))`);
   assert.deepEqual(sectionIds, onProject ? ['overview','story','interface','status','inside'] : ['overview','story','projects','discuss']);
   if (!onProject) {
-    assert.equal(await evaluate("document.querySelector('#discuss-title').textContent"), 'Discussion');
+    assert.equal(await evaluate("document.querySelector('#discuss-title').textContent"), 'Rhizome Discussion Board');
     assert.equal(await evaluate("document.querySelector('.brand strong').textContent"), 'RHIZOME');
+    assert.equal(await evaluate("document.querySelector('#hero-title').innerText.replaceAll(String.fromCharCode(10), ' ').trim()"), 'Rhizome Controller');
+    assert.equal(await evaluate("document.querySelector('meta[property=\"og:site_name\"]').content"), 'Rhizome Controller');
     assert.equal(await evaluate("document.querySelectorAll('.project-card').length"), 3);
   }
   if (!discussionsOnly) {

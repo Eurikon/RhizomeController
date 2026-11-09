@@ -1,4 +1,4 @@
-name: Publish community website
+name: Publish Rhizome Controller website
 
 on:
   workflow_dispatch:
