@@ -70,6 +70,7 @@ if (sections.length) {
   let activeSection = null;
   let anchoredSection = null;
   let navigationTarget = null;
+  let restoringScroll = !location.hash && performance.getEntriesByType('navigation')[0]?.type !== 'navigate';
   let navigationFrame = 0;
   let anchorOffset = 0;
   const anchorTop = entry => entry.section.getBoundingClientRect().top + entry.inset;
@@ -98,7 +99,7 @@ if (sections.length) {
     if (!frame) frame = requestAnimationFrame(updateActive);
   };
   const updateOffset = () => {
-    const retained = navigationTarget || anchoredSection;
+    const retained = navigationTarget || (restoringScroll ? null : anchoredSection);
     const header = getComputedStyle(sidebar).position === 'sticky' ? sidebar : toolbar;
     anchorOffset = header.getBoundingClientRect().height + 15;
     root.style.setProperty('--anchor-offset', `${anchorOffset}px`);
@@ -134,6 +135,7 @@ if (sections.length) {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
       navigationTarget = entry;
+      restoringScroll = false;
       anchoredSection = null;
       if (location.hash !== entry.link.hash) history.pushState(null, '', entry.link.hash);
       cancelAnimationFrame(navigationFrame);
@@ -154,7 +156,10 @@ if (sections.length) {
     }
     queueUpdate();
   });
-  const releaseTarget = () => { navigationTarget = null; };
+  const releaseTarget = () => {
+    navigationTarget = null;
+    restoringScroll = false;
+  };
   window.addEventListener('wheel', releaseTarget, {passive: true});
   window.addEventListener('touchstart', releaseTarget, {passive: true});
   window.addEventListener('keydown', event => {
@@ -178,5 +183,13 @@ if (sections.length) {
   window.addEventListener('pageshow', event => {
     updateOffset();
     if (!event.persisted && initialTarget) scrollToSection(initialTarget, 'instant');
+    if (!event.persisted && !location.hash && !freshOverview) {
+      requestAnimationFrame(() => {
+        if (scrollY === 0) {
+          restoringScroll = false;
+          scrollToSection(overview, 'instant');
+        }
+      });
+    }
   });
 }

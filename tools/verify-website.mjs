@@ -214,6 +214,20 @@ try {
       await waitFor(()=>evaluate("document.readyState==='complete'&&!!document.querySelector('.brand')"), 'Main page did not load');
       await verifyAnchor('overview', '');
       await captureLanding('first-load', width);
+      const initialDocument = await evaluate('performance.timeOrigin');
+      await evaluate("window.scrollTo({top:0,behavior:'instant'})");
+      await send('Page.reload');
+      await waitFor(()=>evaluate(`performance.timeOrigin!==${initialDocument}&&document.readyState==='complete'&&!!document.querySelector('.brand')`), 'Main-page reload did not complete');
+      await verifyAnchor('overview', '');
+      const readingPosition = await evaluate("(() => {window.scrollTo({top:document.querySelector('#projects').getBoundingClientRect().top+scrollY+80,behavior:'instant'});return scrollY;})()");
+      await pause(150);
+      const readingDocument = await evaluate('performance.timeOrigin');
+      await send('Page.reload');
+      await waitFor(()=>evaluate(`performance.timeOrigin!==${readingDocument}&&document.readyState==='complete'&&!!document.querySelector('.brand')`), 'Reading-position reload did not complete');
+      await pause(700);
+      assert(Math.abs(await evaluate('scrollY')-readingPosition)<=2, `Reload changed the reading position at ${width}px`);
+      await clickLink('.brand');
+      await verifyAnchor('overview');
       const hiddenScroll=await evaluate(`(() => {
         const overview=document.querySelector('#overview');
         overview.scrollTop=64;
@@ -258,7 +272,7 @@ try {
         await verifyLogoClicks('Back/Forward after '+route.name, width);
       }
       await captureLanding('repeated-logo', width);
-      console.log(`PASS: ${width}px fresh load without clicks; repeated/rapid logo clicks from every main section, four project-page return links and Back/Forward without clearance or layout drift`);
+      console.log(`PASS: ${width}px fresh load/reload without clicks; repeated/rapid logo clicks from every main section, four project-page return links and Back/Forward without clearance or layout drift`);
     }
     assert.deepEqual(errors, []);
   } else if (projectEntryOnly) {
