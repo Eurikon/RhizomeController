@@ -73,6 +73,9 @@ if (sections.length) {
   let navigationFrame = 0;
   let anchorOffset = 0;
   const anchorTop = entry => entry.section.getBoundingClientRect().top + entry.inset;
+  const scrollToSection = (entry, behavior) => {
+    window.scrollTo({top: Math.max(0, scrollY + anchorTop(entry) - anchorOffset), behavior});
+  };
   const updateActive = () => {
     frame = 0;
     const boundary = anchorOffset + 2;
@@ -120,7 +123,7 @@ if (sections.length) {
       entry.inset = entry === overview ? Math.min(labelInset, imageInset) : labelInset;
       entry.section.style.setProperty('--anchor-inset', `${entry.inset}px`);
     }
-    if (retained) retained.section.scrollIntoView({block: 'start', behavior: 'instant'});
+    if (retained) scrollToSection(retained, 'instant');
     queueUpdate();
   };
   window.addEventListener('scroll', queueUpdate, {passive: true});
@@ -135,13 +138,20 @@ if (sections.length) {
       if (location.hash !== entry.link.hash) history.pushState(null, '', entry.link.hash);
       cancelAnimationFrame(navigationFrame);
       navigationFrame = requestAnimationFrame(() => {
-        entry.section.scrollIntoView({block: 'start', behavior: 'auto'});
+        scrollToSection(entry, 'auto');
         queueUpdate();
       });
     });
   }
   window.addEventListener('hashchange', () => {
     navigationTarget = sections.find(entry => entry.link.hash === location.hash) || null;
+    if (navigationTarget) {
+      cancelAnimationFrame(navigationFrame);
+      navigationFrame = requestAnimationFrame(() => {
+        if (navigationTarget) scrollToSection(navigationTarget, 'instant');
+        queueUpdate();
+      });
+    }
     queueUpdate();
   });
   const releaseTarget = () => { navigationTarget = null; };
@@ -163,5 +173,9 @@ if (sections.length) {
   }
   updateOffset();
   const initialTarget = sections.find(entry => entry.link.hash === location.hash);
-  if (initialTarget) initialTarget.section.scrollIntoView({block: 'start', behavior: 'instant'});
+  if (initialTarget) scrollToSection(initialTarget, 'instant');
+  window.addEventListener('pageshow', event => {
+    updateOffset();
+    if (!event.persisted && initialTarget) scrollToSection(initialTarget, 'instant');
+  });
 }

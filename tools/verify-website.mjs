@@ -9,12 +9,14 @@ const discussionsOnly = args.includes('--discussions-only');
 const contactOnly = args.includes('--contact-only');
 const anchorsOnly = args.includes('--anchors-only');
 const projectEntryOnly = args.includes('--project-entry-only');
+const logoOnly = args.includes('--logo-only');
 const address = args.find(argument => !argument.startsWith('--'));
 assert(address, 'Pass the running website URL');
-assert(args.every(argument => argument === address || argument === '--anchors-only' || argument === '--project-entry-only' || argument === '--discussions-only' || argument === '--contact-only'), 'Unknown verification option');
+assert(args.every(argument => argument === address || argument === '--anchors-only' || argument === '--project-entry-only' || argument === '--discussions-only' || argument === '--contact-only' || argument === '--logo-only'), 'Unknown verification option');
 const base = address.endsWith('/') ? address : address + '/';
 const onProject = new URL(base).pathname.includes('/projects/zynthian-edition/');
 assert(!contactOnly || !onProject, 'Pass the main website URL for contact checks');
+assert(!logoOnly || !onProject, 'Pass the main website URL for logo checks');
 const checkpoint = onProject ? 'status' : 'projects';
 const feedURL = 'https://raw.githubusercontent.com/Eurikon/RhizomeController/main/feed/discussions.json';
 const shots = process.env.RHIZOME_WEBSITE_SHOTS;
@@ -151,7 +153,113 @@ try {
     await pause(50);
   }
   await send('Page.bringToFront');
-  if (projectEntryOnly) {
+  if (logoOnly) {
+    const clickLink = async selector => {
+      if (selector==='.breadcrumb-name' && await evaluate("getComputedStyle(document.querySelector('.toolbar')).position==='static'")) {
+        await evaluate("window.scrollTo({top:0,behavior:'instant'})");
+      }
+      const point = await evaluate(`(() => {
+        const link=document.querySelector(${JSON.stringify(selector)});
+        link.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant',container:'nearest'});
+        const rectangle=link.getBoundingClientRect();
+        const x=rectangle.x+rectangle.width/2,y=rectangle.y+rectangle.height/2;
+        return {x,y,hit:document.elementFromPoint(x,y)?.closest('a')===link,
+          covering:document.elementFromPoint(x,y)?.closest('a')?.getAttribute('href')};
+      })()`);
+      assert(point.hit, `Logo-route target ${selector} is covered at ${JSON.stringify(point)}`);
+      await send('Input.dispatchMouseEvent', {type:'mousePressed',x:point.x,y:point.y,button:'left',clickCount:1});
+      await send('Input.dispatchMouseEvent', {type:'mouseReleased',x:point.x,y:point.y,button:'left',clickCount:1});
+    };
+    const logoState = () => evaluate(`(() => {
+      const overview=document.querySelector('#overview');
+      const copy=overview.querySelector('.hero-copy');
+      const label=overview.querySelector('.eyebrow').getBoundingClientRect();
+      const header=getComputedStyle(document.querySelector('.sidebar')).position==='sticky'
+        ?document.querySelector('.sidebar'):document.querySelector('.toolbar');
+      return {clearance:label.top-header.getBoundingClientRect().bottom,
+        copyOffset:parseFloat(copy.style.getPropertyValue('--hero-copy-offset'))||0,
+        anchorInset:parseFloat(overview.style.getPropertyValue('--anchor-inset'))||0,
+        overviewHeight:overview.getBoundingClientRect().height,
+        internalScroll:overview.scrollTop,
+        nextSectionTop:document.querySelector('#story').getBoundingClientRect().top+scrollY,
+        historyLength:history.length,scroll:scrollY};
+    })()`);
+    const verifyLogoClicks = async (origin, width) => {
+      let baseline;
+      for (let click=1; click<=12; click++) {
+        await clickLink('.brand');
+        try {
+          await verifyAnchor('overview');
+        } catch (error) {
+          assert.fail(`Logo from ${origin}, click ${click}, width ${width}: ${JSON.stringify(await logoState())}; ${error.message}`);
+        }
+        const state=await logoState();
+        assert.equal(state.internalScroll, 0, `Logo from ${origin} left hidden Overview scrolling`);
+        if (!baseline) baseline=state;
+        for (const property of ['clearance','copyOffset','anchorInset','overviewHeight','nextSectionTop','scroll']) {
+          assert(Math.abs(state[property]-baseline[property])<=2,
+            `Logo from ${origin}, click ${click}, width ${width} changed ${property}: ${JSON.stringify({baseline,state})}`);
+        }
+        assert.equal(state.historyLength, baseline.historyLength, 'Repeated logo clicks grew browser history');
+      }
+      for (let click=0; click<12; click++) await clickLink('.brand');
+      await verifyAnchor('overview');
+      const rapid=await logoState();
+      assert(Math.abs(rapid.clearance-baseline.clearance)<=2, `Rapid logo clicks from ${origin} changed clearance`);
+      assert.equal(rapid.historyLength, baseline.historyLength, 'Rapid logo clicks grew browser history');
+    };
+    for (const width of [1440, 1920, 1024, 390]) {
+      await send('Emulation.setDeviceMetricsOverride', {width,height:1000,deviceScaleFactor:1,mobile:false});
+      await send('Page.navigate', {url:base});
+      await waitFor(()=>evaluate("document.readyState==='complete'&&!!document.querySelector('.brand')"), 'Main page did not load');
+      const hiddenScroll=await evaluate(`(() => {
+        const overview=document.querySelector('#overview');
+        overview.scrollTop=64;
+        return {top:overview.scrollTop,range:overview.scrollHeight-overview.clientHeight};
+      })()`);
+      assert.equal(hiddenScroll.top, 0, `Overview accepted hidden scrolling at ${width}px: ${JSON.stringify(hiddenScroll)}`);
+      for (const origin of ['initial', 'story', 'projects', 'discuss', 'contact', 'manual']) {
+        if (origin==='manual') {
+          await evaluate("window.scrollTo({top:document.documentElement.scrollHeight/2,behavior:'instant'})");
+          await pause(100);
+        } else if (origin!=='initial') {
+          await clickMenu(origin);
+          await verifyAnchor(origin);
+        }
+        await verifyLogoClicks(origin, width);
+      }
+      for (const route of [
+        {name:'project logo',section:'overview',selector:'.brand',destination:'overview'},
+        {name:'project breadcrumb',section:'status',selector:'.breadcrumb-name',destination:'overview'},
+        {name:'project story link',section:'story',selector:'.story-sources a',destination:'story'},
+        {name:'project Discussion link',section:'inside',selector:'.navigation a[href="../../#discuss"]',destination:'discuss'}
+      ]) {
+        await clickMenu('projects');
+        await verifyAnchor('projects');
+        await clickLink('.current-project');
+        const project=new URL('projects/zynthian-edition/#overview',base).href;
+        await waitFor(()=>evaluate(`location.href===${JSON.stringify(project)}&&document.readyState==='complete'&&!!document.querySelector('#inside')`), 'Project page did not load');
+        await clickMenu(route.section);
+        await verifyAnchor(route.section);
+        await clickLink(route.selector);
+        const destination=new URL('#'+route.destination,base).href;
+        await waitFor(()=>evaluate(`location.href===${JSON.stringify(destination)}&&document.readyState==='complete'&&!!document.querySelector('#contact')`), `${route.name} did not return to the main page`);
+        await verifyAnchor(route.destination);
+        await verifyLogoClicks(route.name, width);
+        const steps=route.destination==='overview'?1:2;
+        await evaluate(`history.go(-${steps})`);
+        const previous=new URL('projects/zynthian-edition/#'+route.section,base).href;
+        await waitFor(()=>evaluate(`location.href===${JSON.stringify(previous)}&&document.readyState==='complete'&&!!document.querySelector('#inside')`), 'Back did not restore the project page');
+        await evaluate(`history.go(${steps})`);
+        const restored=new URL('#overview',base).href;
+        await waitFor(()=>evaluate(`location.href===${JSON.stringify(restored)}&&document.readyState==='complete'&&!!document.querySelector('#contact')`), 'Forward did not restore the main page');
+        await verifyLogoClicks('Back/Forward after '+route.name, width);
+      }
+      await captureLanding('repeated-logo', width);
+      console.log(`PASS: ${width}px repeated/rapid logo clicks from every main section, four project-page return links and Back/Forward without clearance or layout drift`);
+    }
+    assert.deepEqual(errors, []);
+  } else if (projectEntryOnly) {
     assert(!onProject, 'Pass the community home URL for the project-entry check');
     for (const width of [1440, 390]) {
       await send('Emulation.setDeviceMetricsOverride', {width,height:1000,deviceScaleFactor:1,mobile:false});
