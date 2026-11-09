@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generatedAt": "2026-11-09T18:35:23.973989Z",
+  "generatedAt": "2026-11-09T19:07:54.967272Z",
   "discussions": [
     {
       "number": 1,
       "title": "Rhizome Controller Discussion",
-      "bodyHTML": "<p dir=\"auto\">Welcome to the  Rhizome LE and Rhizome SXE discussion board.<br>\nDiscuss: questions | ideas | experiences | hardware discoveries,<br>\nand the upcoming Rhizome Zynthian Edition here.</p>\n<p dir=\"auto\">For a separate topic, <a href=\"https://github.com/Eurikon/RhizomeController/discussions/new/choose\">start a new discussion</a>.<br>\nUse Q&amp;A for questions, Ideas for suggestions, and Show and tell for your setup.</p>\n<p dir=\"auto\"><a href=\"https://eurikon.github.io/RhizomeZynthianEdition/\" rel=\"nofollow\">Visit the project website</a>.</p>",
+      "bodyHTML": "<p dir=\"auto\">Welcome to the  Rhizome LE and Rhizome SXE discussion board.<br>\nDiscuss: questions | ideas | experiences | hardware discoveries,<br>\nand the upcoming Rhizome Zynthian Edition here.</p>\n<p dir=\"auto\">For a separate topic, <a href=\"https://github.com/Eurikon/RhizomeController/discussions/new/choose\">start a new discussion</a>.<br>\nUse Q&amp;A for questions, Ideas for suggestions, and Show and tell for your setup.</p>\n<p dir=\"auto\"><a href=\"https://eurikon.github.io/RhizomeController/projects/zynthian-edition/\" rel=\"nofollow\">Visit the project website</a>.</p>",
       "url": "https://github.com/Eurikon/RhizomeController/discussions/1",
-      "updatedAt": "2026-11-09T18:35:14Z",
+      "updatedAt": "2026-11-09T19:07:40Z",
       "category": {
         "name": "Announcements"
       },
