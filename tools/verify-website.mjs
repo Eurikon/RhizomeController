@@ -360,7 +360,7 @@ try {
     assert.deepEqual(await evaluate(`(() => {
       const config=document.querySelector('#discuss script[data-giscus-client]').dataset;
       return [config.repo,config.mapping,config.term,config.emitMetadata,config.theme];
-    })()`), ['Eurikon/RhizomeController','number',String(announcement.number),'1',(['localhost','127.0.0.1'].includes(new URL(base).hostname) ? 'https://eurikon.github.io/RhizomeZynthianEdition/giscus-theme.css' : 'https://eurikon.github.io/RhizomeController/giscus-theme.css')]);
+    })()`), ['Eurikon/RhizomeController','number',String(announcement.number),'1','https://eurikon.github.io/RhizomeController/giscus-theme.css']);
     await waitFor(async () => (await postState()).ready, 'Official giscus did not confirm the live announcement', 30000);
     console.log(`PASS: live discussion #${announcement.number} “${announcement.title}”, full post and official giscus metadata`);
     if(shots) {
@@ -435,7 +435,7 @@ try {
       + '<p>END FULL POST</p>';
     const malicious = synthetic.find(item=>item.number===1005);
     malicious.bodyHTML = `<p>Safe text remains</p><script>window.__rhizomeUnsafe=true</script>
-      <img src="https://eurikon.github.io/RhizomeZynthianEdition/verification-missing-image.png" onerror="window.__rhizomeUnsafe=true">
+      <img src="https://eurikon.github.io/RhizomeController/verification-missing-image.png" onerror="window.__rhizomeUnsafe=true">
       <a href="javascript:window.__rhizomeUnsafe=true">unsafe-js</a><a href="data:text/html,unsafe">unsafe-data</a>
       <a href="https://user:password@example.com/">unsafe-credentials</a><a href="https://zynthian.org/">safe-link</a>
       <iframe srcdoc="<script>parent.__rhizomeUnsafe=true</script>"></iframe><svg onload="window.__rhizomeUnsafe=true"></svg>

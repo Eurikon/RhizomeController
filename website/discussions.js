@@ -4,9 +4,7 @@
   const section = document.getElementById('discuss');
   if (!section) return;
   const repository = 'Eurikon/RhizomeController';
-  const themeURL = ['localhost', '127.0.0.1'].includes(location.hostname)
-    ? 'https://eurikon.github.io/RhizomeZynthianEdition/giscus-theme.css'
-    : 'https://eurikon.github.io/RhizomeController/giscus-theme.css';
+  const themeURL = 'https://eurikon.github.io/RhizomeController/giscus-theme.css';
   const discussionBase = `https://github.com/${repository}/discussions/`;
   const feedURL = `https://raw.githubusercontent.com/${repository}/main/feed/discussions.json`;
   const archiveBase = `https://raw.githubusercontent.com/${repository}/main/feed/threads/`;
