@@ -1,0 +1,40 @@
+name: Update discussion feed
+
+on:
+  discussion:
+  discussion_comment:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  discussions: read
+
+concurrency:
+  group: discussions-feed
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+      - name: Export recent discussions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/export-discussions.py
+      - name: Publish changed feed
+        run: |
+          git config user.name 'Eurikon'
+          git config user.email '40998416+Eurikon@users.noreply.github.com'
+          git config user.useConfigOnly true
+          git add feed/discussions.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Update recent discussions'
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
