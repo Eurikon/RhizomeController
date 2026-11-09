@@ -1,0 +1,14 @@
+.DS_Store
+._*
+.local/
+dist/
+__pycache__/
+*.py[cod]
+node_modules/
+.env
+.env.*
+*.local.json
+*.log
+HANDOFF.md
+STATE.md
+CONTINUE-HERE.md

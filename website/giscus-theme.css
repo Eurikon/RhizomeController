@@ -1,0 +1,100 @@
+/*! MIT License
+ * Copyright (c) 2018 GitHub Inc.
+ * https://github.com/primer/primitives/blob/main/LICENSE
+ */
+
+:root { color-scheme: dark; }
+body { background: transparent; }
+main {
+  --color-prettylights-syntax-comment: #9ba3ac;
+  --color-prettylights-syntax-constant: #8adfff;
+  --color-prettylights-syntax-entity: #d2a8ff;
+  --color-prettylights-syntax-storage-modifier-import: #eceeef;
+  --color-prettylights-syntax-entity-tag: #7ee787;
+  --color-prettylights-syntax-keyword: #ff7b72;
+  --color-prettylights-syntax-string: #a5d6ff;
+  --color-prettylights-syntax-variable: #ffa657;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #f85149;
+  --color-prettylights-syntax-invalid-illegal-text: #eceeef;
+  --color-prettylights-syntax-invalid-illegal-bg: #8e1519;
+  --color-prettylights-syntax-carriage-return-text: #eceeef;
+  --color-prettylights-syntax-carriage-return-bg: #b62324;
+  --color-prettylights-syntax-string-regexp: #7ee787;
+  --color-prettylights-syntax-markup-list: #f2cc60;
+  --color-prettylights-syntax-markup-heading: #01aef0;
+  --color-prettylights-syntax-markup-italic: #eceeef;
+  --color-prettylights-syntax-markup-bold: #eceeef;
+  --color-prettylights-syntax-markup-deleted-text: #ffdcd7;
+  --color-prettylights-syntax-markup-deleted-bg: #67060c;
+  --color-prettylights-syntax-markup-inserted-text: #aff5b4;
+  --color-prettylights-syntax-markup-inserted-bg: #033a16;
+  --color-prettylights-syntax-markup-changed-text: #ffdfb6;
+  --color-prettylights-syntax-markup-changed-bg: #5a1e02;
+  --color-prettylights-syntax-markup-ignored-text: #eceeef;
+  --color-prettylights-syntax-markup-ignored-bg: #075b7b;
+  --color-prettylights-syntax-meta-diff-range: #d2a8ff;
+  --color-prettylights-syntax-brackethighlighter-angle: #9ba3ac;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #505b66;
+  --color-prettylights-syntax-constant-other-reference-link: #8adfff;
+  --color-btn-text: #eceeef;
+  --color-btn-bg: #252a30;
+  --color-btn-border: #3b4651;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #30383f;
+  --color-btn-hover-border: #62798c;
+  --color-btn-active-bg: #1b1e22;
+  --color-btn-active-border: #8adfff;
+  --color-btn-selected-bg: #191b1e;
+  --color-btn-primary-text: #051722;
+  --color-btn-primary-bg: #01aef0;
+  --color-btn-primary-border: #39c7ff;
+  --color-btn-primary-shadow: 0 0 transparent;
+  --color-btn-primary-inset-shadow: 0 1px 0 #ffffff22;
+  --color-btn-primary-hover-bg: #33c3fb;
+  --color-btn-primary-hover-border: #8adfff;
+  --color-btn-primary-selected-bg: #01aef0;
+  --color-btn-primary-selected-shadow: 0 0 transparent;
+  --color-btn-primary-disabled-text: #8c9aa7;
+  --color-btn-primary-disabled-bg: #174153;
+  --color-btn-primary-disabled-border: #25546a;
+  --color-action-list-item-default-hover-bg: #ffffff0d;
+  --color-segmented-control-bg: #252a30;
+  --color-segmented-control-button-bg: #17191c;
+  --color-segmented-control-button-selected-border: #62798c;
+  --color-fg-default: #eceeef;
+  --color-fg-muted: #9ba3ac;
+  --color-fg-subtle: #8293a1;
+  --color-canvas-default: #1b1e22;
+  --color-canvas-overlay: #252a30;
+  --color-canvas-inset: #111316;
+  --color-canvas-subtle: #191b1e;
+  --color-border-default: #30353b;
+  --color-border-muted: #30353b;
+  --color-neutral-muted: #505b6666;
+  --color-accent-fg: #01aef0;
+  --color-accent-emphasis: #01aef0;
+  --color-accent-muted: #01aef052;
+  --color-accent-subtle: #01aef014;
+  --color-success-fg: #3fb950;
+  --color-attention-fg: #d29922;
+  --color-attention-muted: #bb800966;
+  --color-attention-subtle: #bb800926;
+  --color-danger-fg: #f85149;
+  --color-danger-muted: #f8514966;
+  --color-danger-subtle: #f851491a;
+  --color-primer-shadow-inset: 0 0 transparent;
+  --color-scale-gray-7: #252a30;
+  --color-scale-blue-8: #075b7b;
+  --color-social-reaction-bg-hover: var(--color-scale-gray-7);
+  --color-social-reaction-bg-reacted-hover: var(--color-scale-blue-8);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main .pagination-loader-container {
+  background-image: url("https://github.com/images/modules/pulls/progressive-disclosure-line-dark.svg");
+}
+
+main .gsc-loading-image {
+  background-image: url("https://github.githubassets.com/images/mona-loading-dark.gif");
+}

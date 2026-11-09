@@ -30,7 +30,7 @@ jobs:
           git config user.name 'Eurikon'
           git config user.email '40998416+Eurikon@users.noreply.github.com'
           git config user.useConfigOnly true
-          git add feed/discussions.json
+          git add feed/
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Update recent discussions'
           for attempt in 1 2 3; do
