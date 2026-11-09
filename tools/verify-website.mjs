@@ -96,7 +96,7 @@ try {
     await send('Input.dispatchMouseEvent', {type: 'mousePressed', ...point, button: 'left', clickCount: 1});
     await send('Input.dispatchMouseEvent', {type: 'mouseReleased', ...point, button: 'left', clickCount: 1});
   };
-  const verifyAnchor = async id => {
+  const verifyAnchor = async (id, expectedHash = '#' + id) => {
     let state, stable = 0;
     for (let attempt = 0; attempt < 160; attempt++) {
       state = await evaluate(`(() => {
@@ -123,14 +123,14 @@ try {
         && state.labelTop >= state.headerBottom - 2 && state.titleTop >= state.headerBottom - 2
         && state.labelBottom <= state.height && state.titleBottom <= state.height
         && (!state.sideBySide || Math.abs(state.labelTop - state.imageTop) <= 2)
-        && state.hash === '#' + id && state.active === '#' + id;
+        && state.hash === expectedHash && state.active === '#' + id;
       stable = aligned ? stable + 1 : 0;
       if (stable >= 3) return;
       await pause(25);
     }
     assert(['H1','H2'].includes(state.heading), `${id} must retain its section heading`);
     assert(state.headers > 0, `${id} has no visible sticky header`);
-    assert.equal(state.hash, '#' + id);
+    assert.equal(state.hash, expectedHash);
     assert(Math.abs(state.top - (state.headerBottom + 15)) <= 2,
       `${id} anchor mismatch: ${JSON.stringify(state)}`);
     assert(state.labelTop >= state.headerBottom - 2 && state.titleTop >= state.headerBottom - 2
@@ -212,6 +212,8 @@ try {
       await send('Emulation.setDeviceMetricsOverride', {width,height:1000,deviceScaleFactor:1,mobile:false});
       await send('Page.navigate', {url:base});
       await waitFor(()=>evaluate("document.readyState==='complete'&&!!document.querySelector('.brand')"), 'Main page did not load');
+      await verifyAnchor('overview', '');
+      await captureLanding('first-load', width);
       const hiddenScroll=await evaluate(`(() => {
         const overview=document.querySelector('#overview');
         overview.scrollTop=64;
@@ -256,7 +258,7 @@ try {
         await verifyLogoClicks('Back/Forward after '+route.name, width);
       }
       await captureLanding('repeated-logo', width);
-      console.log(`PASS: ${width}px repeated/rapid logo clicks from every main section, four project-page return links and Back/Forward without clearance or layout drift`);
+      console.log(`PASS: ${width}px fresh load without clicks; repeated/rapid logo clicks from every main section, four project-page return links and Back/Forward without clearance or layout drift`);
     }
     assert.deepEqual(errors, []);
   } else if (projectEntryOnly) {

@@ -172,7 +172,8 @@ if (sections.length) {
     if (shot) observer.observe(shot);
   }
   updateOffset();
-  const initialTarget = sections.find(entry => entry.link.hash === location.hash);
+  const freshOverview = !location.hash && performance.getEntriesByType('navigation')[0]?.type === 'navigate';
+  const initialTarget = sections.find(entry => entry.link.hash === location.hash) || (freshOverview ? overview : null);
   if (initialTarget) scrollToSection(initialTarget, 'instant');
   window.addEventListener('pageshow', event => {
     updateOffset();
