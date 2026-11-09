@@ -34,11 +34,7 @@ def build():
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / 'website' / name, target)
     (destination / '.nojekyll').touch()
-    legacy = ROOT / 'dist/legacy-site'
-    legacy.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT / 'legacy-site/index.html', legacy / 'index.html')
-    (legacy / '.nojekyll').touch()
-    print('Built public-only website in dist/website; separate transition in dist/legacy-site')
+    print('Built public-only website in dist/website')
 
 
 if __name__ == '__main__':

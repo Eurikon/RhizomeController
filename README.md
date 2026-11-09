@@ -14,7 +14,6 @@ Feeltune abandoned the product line. This community brings together hardware kno
 - `tools/`: allowlisted site export, browser verification and privacy checks.
 - `scripts/` and `feed/`: the existing public discussion feed and its exporter.
 - `.github/workflows/`: discussion updates and manually triggered website publishing.
-- `legacy-site/`: the transition page prepared for the previous website address.
 
 ## Local preview
 

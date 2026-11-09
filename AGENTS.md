@@ -24,4 +24,4 @@ Set `core.hooksPath` to `.githooks`. Privacy hooks inspect staging and reachable
 
 ## Publication
 
-Publish only when the owner explicitly requests it. The site workflow runs manually, independently of discussion-feed updates. Publish only the allowlisted export. Keep the old-address transition separate until the new site is verified live. Discussion embeds and theme URLs must use the community address while preserving the existing discussion repository and IDs. Keep HANDOFF.md, STATE.md and CONTINUE-HERE.md local and ignored.
+Publish only when the owner explicitly requests it. The site workflow runs manually, independently of discussion-feed updates. Publish only the allowlisted export. Use the community address exclusively; the previous project Pages site is retired and must not be recreated or redirected. Discussion embeds and theme URLs must use the community address while preserving the existing discussion repository and IDs. Keep HANDOFF.md, STATE.md and CONTINUE-HERE.md local and ignored.
